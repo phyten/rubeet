@@ -10,6 +10,7 @@ Style/StringLiteralsInInterpolation:
 Metrics/BlockLength:
   Exclude:
     - '*.gemspec'
+    - 'spec/**/*.rb'
 
 Metrics/MethodLength:
   Max: 20
