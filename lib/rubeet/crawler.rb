@@ -27,14 +27,32 @@ module Rubeet
 
         # Sets the initial URLs for the crawler to start from.
         # These URLs will be the first ones processed when crawling begins.
+        # Accepts either a single URL as a string or an array of URLs.
         #
-        # @param urls [Array<String>] List of URLs to start crawling from
-        # @return [void]
+        # @param urls [String, Array<String>] Single URL or list of URLs to start crawling from
+        # @return [Array<String>] The processed array of URLs
+        # @raise [ArgumentError] If no URLs are provided
         #
-        # @example
+        # @example Setting multiple URLs
         #   start_urls ["https://example.com/page1", "https://example.com/page2"]
+        #
+        # @example Setting a single URL
+        #   start_urls "https://example.com/page1"
+        #
+        # @example Invalid URL format will trigger a warning
+        #   start_urls ["ftp://example.com"]  # => Warning: URL should start with http:// or https://
         def start_urls(urls)
-          @start_urls = urls
+          @start_urls = Array(urls)
+
+          # Validate that at least one start URL is provided
+          raise ArgumentError, "At least one start URL must be provided" if @start_urls.empty?
+
+          # Warn if any start URLs are missing the http:// or https:// prefix
+          @start_urls.each do |url|
+            warn "Warning: URL '#{url}' should start with http:// or https://" unless url.match?(%r{\Ahttps?://})
+          end
+
+          @start_urls
         end
 
         # Defines a parser method for processing responses.
