@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img src="https://github.com/user-attachments/assets/34c651ce-361c-49ce-8111-1b3471aa6f6d" height="200" width="200" />
+  <img src="https://github.com/user-attachments/assets/cc31483b-6a03-496f-b54c-76491a9d39e2" height="400" width="400" />
   <h4 align="center">Full-Stack Web Crawling and Scraping Framework for Ruby.</h2>
 </h1>
 
