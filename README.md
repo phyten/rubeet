@@ -1,3 +1,8 @@
+<h1 align="center">
+  <img src="https://github.com/user-attachments/assets/34c651ce-361c-49ce-8111-1b3471aa6f6d" height="200" width="200" />
+  <h4 align="center">Full-Stack Web Crawling and Scraping Framework for Ruby.</h2>
+</h1>
+
 # Rubeet
 
 TODO: Delete this and the text below, and describe your gem
