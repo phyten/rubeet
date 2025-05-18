@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require "net/http"
+require "uri"
+
 module Rubeet
   module Crawler
     # Base class for all crawlers in the Rubeet framework.
@@ -139,10 +142,39 @@ module Rubeet
       # @return [Response] Response object containing the page content
       # @raise [NetworkError] If the URL cannot be fetched
       # @private
+      # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
       def fetch_url(url)
-        # この部分は後でHTTPクライアントの実装時に実装します
-        raise NotImplementedError, "fetch_url method must be implemented"
+        uri = URI.parse(url)
+        retries = 0
+
+        begin
+          http = Net::HTTP.new(uri.host, uri.port)
+          http.use_ssl = uri.scheme == "https"
+          http.open_timeout = @config.request_timeout
+          http.read_timeout = @config.request_timeout
+
+          request = Net::HTTP::Get.new(uri)
+          request["User-Agent"] = @config.user_agent
+
+          response = http.request(request)
+
+          Rubeet::Response.new(
+            uri: uri,
+            body: response.body,
+            status: response.code.to_i,
+            headers: response.to_hash
+          )
+        rescue StandardError => e
+          retries += 1
+          if retries <= @config.max_retries
+            sleep(@config.retry_wait_time)
+            retry
+          end
+
+          raise NetworkError, e.message
+        end
       end
+      # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
 
       # Finds the appropriate parser for a URL
       #

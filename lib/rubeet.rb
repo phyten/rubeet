@@ -2,6 +2,7 @@
 
 require_relative "rubeet/version"
 require_relative "rubeet/crawler"
+require_relative "rubeet/response"
 require_relative "rubeet/core"
 
 # Main module for the Rubeet web crawling framework.
