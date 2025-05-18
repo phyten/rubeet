@@ -20,6 +20,28 @@ RSpec.describe Rubeet::Crawler::Base do
   end
 
   describe "#initialize" do
+    context "when all required settings are provided" do
+      it "creates a new instance successfully" do
+        crawler_class = create_crawler_class do
+          domain "example.com"
+          start_urls ["https://example.com"]
+        end
+
+        expect { crawler_class.new }.not_to raise_error
+      end
+
+      it "inherits settings from the class level" do
+        crawler_class = create_crawler_class do
+          domain "example.com"
+          start_urls ["https://example.com"]
+        end
+
+        instance = crawler_class.new
+        expect(instance.domain).to eq("example.com")
+        expect(instance.start_urls).to eq(["https://example.com"])
+      end
+    end
+
     context "when domain is not set" do
       it "raises an error" do
         crawler_class = create_crawler_class {}
@@ -158,30 +180,6 @@ RSpec.describe Rubeet::Crawler::Base do
       end
 
       expect(crawler_class.parsers.keys).to contain_exactly(:category, :product)
-    end
-  end
-
-  describe "#initialize" do
-    context "when all required settings are provided" do
-      it "creates a new instance successfully" do
-        crawler_class = create_crawler_class do
-          domain "example.com"
-          start_urls ["https://example.com"]
-        end
-
-        expect { crawler_class.new }.not_to raise_error
-      end
-
-      it "inherits settings from the class level" do
-        crawler_class = create_crawler_class do
-          domain "example.com"
-          start_urls ["https://example.com"]
-        end
-
-        instance = crawler_class.new
-        expect(instance.domain).to eq("example.com")
-        expect(instance.start_urls).to eq(["https://example.com"])
-      end
     end
   end
 end
