@@ -182,4 +182,58 @@ RSpec.describe Rubeet::Crawler::Base do
       expect(crawler_class.parsers.keys).to contain_exactly(:category, :product)
     end
   end
+
+  describe "#fetch_url" do
+    let(:config) do
+      Rubeet::Core::Configuration.new.tap do |c|
+        c.max_retries = 1
+        c.retry_wait_time = 0
+        c.request_timeout = 5
+        c.user_agent = "TestAgent"
+      end
+    end
+
+    let(:crawler) do
+      create_crawler_class do
+        domain "example.com"
+        start_urls ["https://example.com"]
+      end.new(config)
+    end
+
+    it "returns a Response on success" do
+      http = instance_double(Net::HTTP)
+      response = instance_double(
+        Net::HTTPSuccess,
+        body: "ok",
+        code: "200",
+        to_hash: {}
+      )
+
+      allow(Net::HTTP).to receive(:new).and_return(http)
+      allow(http).to receive(:use_ssl=)
+      allow(http).to receive(:open_timeout=)
+      allow(http).to receive(:read_timeout=)
+      allow(http).to receive(:request).and_return(response)
+
+      result = crawler.send(:fetch_url, "https://example.com")
+
+      expect(result).to be_a(Rubeet::Response)
+      expect(result.body).to eq("ok")
+      expect(result.status).to eq(200)
+    end
+
+    it "raises NetworkError after retries" do
+      http = instance_double(Net::HTTP)
+
+      allow(Net::HTTP).to receive(:new).and_return(http)
+      allow(http).to receive(:use_ssl=)
+      allow(http).to receive(:open_timeout=)
+      allow(http).to receive(:read_timeout=)
+      allow(http).to receive(:request).and_raise(StandardError)
+
+      expect do
+        crawler.send(:fetch_url, "https://example.com")
+      end.to raise_error(Rubeet::NetworkError)
+    end
+  end
 end
